@@ -1,0 +1,178 @@
+version: '3.8'
+
+services:
+  # Frontend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    environment:
+      - REACT_APP_API_URL=http://localhost:8000
+      - REACT_APP_GRAPHQL_URL=http://localhost:8000/graphql
+      - REACT_APP_BLOCKCHAIN_NETWORK=polygon
+    depends_on:
+      - backend
+    networks:
+      - nexusverse-network
+
+  # Backend API
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+      - DATABASE_URL=postgresql://nexusverse:password@postgres:5432/nexusverse
+      - MONGODB_URL=mongodb://mongodb:27017/nexusverse
+      - JWT_SECRET=your-super-secret-jwt-key-change-in-production
+      - STRIPE_SECRET_KEY=sk_test_your_stripe_key
+      - POLYGON_RPC_URL=https://polygon-rpc.com
+      - IPFS_GATEWAY=https://ipfs.io/ipfs/
+    depends_on:
+      - postgres
+      - mongodb
+      - redis
+    networks:
+      - nexusverse-network
+
+  # PostgreSQL Database
+  postgres:
+    image: postgres:14-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=nexusverse
+      - POSTGRES_USER=nexusverse
+      - POSTGRES_PASSWORD=password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - nexusverse-network
+
+  # MongoDB Database
+  mongodb:
+    image: mongo:6.0
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_DATABASE=nexusverse
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - nexusverse-network
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - nexusverse-network
+
+  # AI/ML Service
+  ai-service:
+    build:
+      context: ./ai
+      dockerfile: Dockerfile
+    ports:
+      - "8001:8001"
+    volumes:
+      - ./ai:/app
+      - ai_models:/app/models
+    environment:
+      - MODEL_PATH=/app/models
+      - API_KEY=your-ai-api-key
+    networks:
+      - nexusverse-network
+
+  # IPFS Node (for decentralized storage)
+  ipfs:
+    image: ipfs/kubo:latest
+    ports:
+      - "4001:4001"
+      - "5001:5001"
+      - "8080:8080"
+    volumes:
+      - ipfs_data:/data/ipfs
+    networks:
+      - nexusverse-network
+
+  # Hardhat Network (for blockchain development)
+  hardhat:
+    build:
+      context: ./blockchain
+      dockerfile: Dockerfile
+    ports:
+      - "8545:8545"
+    volumes:
+      - ./blockchain:/app
+      - /app/node_modules
+    environment:
+      - NETWORK=hardhat
+    networks:
+      - nexusverse-network
+
+  # Nginx (Reverse Proxy)
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/ssl:/etc/nginx/ssl
+    depends_on:
+      - frontend
+      - backend
+    networks:
+      - nexusverse-network
+
+  # Monitoring Stack
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    networks:
+      - nexusverse-network
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3001:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana_data:/var/lib/grafana
+    depends_on:
+      - prometheus
+    networks:
+      - nexusverse-network
+
+volumes:
+  postgres_data:
+  mongodb_data:
+  redis_data:
+  ai_models:
+  ipfs_data:
+  prometheus_data:
+  grafana_data:
+
+networks:
+  nexusverse-network:
+    driver: bridge 

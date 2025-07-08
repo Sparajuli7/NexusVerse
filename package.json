@@ -1,0 +1,84 @@
+{
+  "name": "nexusverse",
+  "version": "1.0.0",
+  "description": "A decentralized, AI-driven platform for personal and professional networking",
+  "main": "index.js",
+  "scripts": {
+    "dev": "concurrently \"npm run dev:frontend\" \"npm run dev:backend\" \"npm run dev:blockchain\"",
+    "dev:frontend": "cd frontend && npm start",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:blockchain": "cd blockchain && npm run node",
+    "build": "npm run build:frontend && npm run build:backend",
+    "build:frontend": "cd frontend && npm run build",
+    "build:backend": "cd backend && npm run build",
+    "test": "npm run test:frontend && npm run test:backend && npm run test:blockchain",
+    "test:frontend": "cd frontend && npm test",
+    "test:backend": "cd backend && npm test",
+    "test:blockchain": "cd blockchain && npm test",
+    "test:integration": "npm run test:e2e",
+    "test:e2e": "cypress run",
+    "lint": "npm run lint:frontend && npm run lint:backend",
+    "lint:frontend": "cd frontend && npm run lint",
+    "lint:backend": "cd backend && npm run lint",
+    "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,md}\"",
+    "type-check": "npm run type-check:frontend && npm run type-check:backend",
+    "type-check:frontend": "cd frontend && npm run type-check",
+    "type-check:backend": "cd backend && npm run type-check",
+    "install:all": "npm install && cd frontend && npm install && cd ../backend && npm install && cd ../blockchain && npm install && cd ../ai && npm install",
+    "docker:build": "docker-compose build",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "docker:logs": "docker-compose logs -f",
+    "deploy:staging": "npm run build && docker-compose -f docker-compose.staging.yml up -d",
+    "deploy:production": "npm run build && docker-compose -f docker-compose.production.yml up -d",
+    "db:migrate": "cd backend && npm run migrate",
+    "db:seed": "cd backend && npm run seed",
+    "blockchain:deploy": "cd blockchain && npm run deploy",
+    "blockchain:verify": "cd blockchain && npm run verify",
+    "ai:train": "cd ai && npm run train",
+    "ai:serve": "cd ai && npm run serve",
+    "security:audit": "npm audit && cd frontend && npm audit && cd ../backend && npm audit",
+    "docs:generate": "typedoc --out docs/api frontend/src backend/src",
+    "docs:serve": "cd docs && python -m http.server 8080"
+  },
+  "keywords": [
+    "blockchain",
+    "ai",
+    "networking",
+    "decentralized",
+    "social",
+    "community",
+    "ethereum",
+    "polygon",
+    "react",
+    "nodejs",
+    "typescript"
+  ],
+  "author": "NexusVerse Team",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "prettier": "^3.1.0",
+    "typedoc": "^0.25.0",
+    "cypress": "^13.6.0",
+    "@types/node": "^20.10.0"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/nexusverse.git"
+  },
+  "bugs": {
+    "url": "https://github.com/your-username/nexusverse/issues"
+  },
+  "homepage": "https://github.com/your-username/nexusverse#readme",
+  "workspaces": [
+    "frontend",
+    "backend",
+    "blockchain",
+    "ai"
+  ]
+} 
