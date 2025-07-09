@@ -1,10 +1,12 @@
 import React from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Provider } from 'react-redux';
+import { store } from './store';
 import { Toaster } from 'react-hot-toast';
 
+// Components
 import Layout from './components/Layout';
 import ProtectedRoute from './components/ProtectedRoute';
-import LoadingSpinner from './components/LoadingSpinner';
 
 // Pages
 import HomePage from './pages/HomePage';
@@ -19,71 +21,139 @@ import EventDetailPage from './pages/EventDetailPage';
 import SettingsPage from './pages/SettingsPage';
 import NotFoundPage from './pages/NotFoundPage';
 
-// Hooks
-import { useAuth } from './hooks/useAuth';
-import { useWeb3 } from './hooks/useWeb3';
+// Styles
+import './index.css';
 
-function App() {
-  const { isLoading: authLoading } = useAuth();
-  const { isLoading: web3Loading } = useWeb3();
-
-  if (authLoading || web3Loading) {
-    return <LoadingSpinner />;
-  }
-
+const App: React.FC = () => {
   return (
-    <div className="App">
-      <Routes>
-        {/* Public routes */}
-        <Route path="/" element={<HomePage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
-        
-        {/* Protected routes */}
-        <Route path="/app" element={
-          <ProtectedRoute>
-            <Layout />
-          </ProtectedRoute>
-        }>
-          <Route index element={<DashboardPage />} />
-          <Route path="profile" element={<ProfilePage />} />
-          <Route path="communities" element={<CommunitiesPage />} />
-          <Route path="communities/:id" element={<CommunityDetailPage />} />
-          <Route path="events" element={<EventsPage />} />
-          <Route path="events/:id" element={<EventDetailPage />} />
-          <Route path="settings" element={<SettingsPage />} />
-        </Route>
-        
-        {/* 404 */}
-        <Route path="*" element={<NotFoundPage />} />
-      </Routes>
-      
-      <Toaster
-        position="top-right"
-        toastOptions={{
-          duration: 4000,
-          style: {
-            background: '#363636',
-            color: '#fff',
-          },
-          success: {
-            duration: 3000,
-            iconTheme: {
-              primary: '#22c55e',
-              secondary: '#fff',
-            },
-          },
-          error: {
-            duration: 5000,
-            iconTheme: {
-              primary: '#ef4444',
-              secondary: '#fff',
-            },
-          },
-        }}
-      />
-    </div>
+    <Provider store={store}>
+      <Router>
+        <div className="App">
+          <Routes>
+            {/* Public routes */}
+            <Route path="/" element={<HomePage />} />
+            <Route 
+              path="/login" 
+              element={
+                <ProtectedRoute requireAuth={false}>
+                  <LoginPage />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/register" 
+              element={
+                <ProtectedRoute requireAuth={false}>
+                  <RegisterPage />
+                </ProtectedRoute>
+              } 
+            />
+
+            {/* Protected routes */}
+            <Route 
+              path="/dashboard" 
+              element={
+                <ProtectedRoute>
+                  <Layout>
+                    <DashboardPage />
+                  </Layout>
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/profile" 
+              element={
+                <ProtectedRoute>
+                  <Layout>
+                    <ProfilePage />
+                  </Layout>
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/communities" 
+              element={
+                <ProtectedRoute>
+                  <Layout>
+                    <CommunitiesPage />
+                  </Layout>
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/communities/:id" 
+              element={
+                <ProtectedRoute>
+                  <Layout>
+                    <CommunityDetailPage />
+                  </Layout>
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/events" 
+              element={
+                <ProtectedRoute>
+                  <Layout>
+                    <EventsPage />
+                  </Layout>
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/events/:id" 
+              element={
+                <ProtectedRoute>
+                  <Layout>
+                    <EventDetailPage />
+                  </Layout>
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/settings" 
+              element={
+                <ProtectedRoute>
+                  <Layout>
+                    <SettingsPage />
+                  </Layout>
+                </ProtectedRoute>
+              } 
+            />
+
+            {/* 404 route */}
+            <Route path="*" element={<NotFoundPage />} />
+          </Routes>
+
+          {/* Toast notifications */}
+          <Toaster
+            position="top-right"
+            toastOptions={{
+              duration: 4000,
+              style: {
+                background: '#363636',
+                color: '#fff',
+              },
+              success: {
+                duration: 3000,
+                iconTheme: {
+                  primary: '#10B981',
+                  secondary: '#fff',
+                },
+              },
+              error: {
+                duration: 5000,
+                iconTheme: {
+                  primary: '#EF4444',
+                  secondary: '#fff',
+                },
+              },
+            }}
+          />
+        </div>
+      </Router>
+    </Provider>
   );
-}
+};
 
 export default App; 
