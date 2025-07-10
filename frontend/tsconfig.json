@@ -25,14 +25,17 @@
       "@/components/*": ["components/*"],
       "@/pages/*": ["pages/*"],
       "@/hooks/*": ["hooks/*"],
+      "@/services/*": ["services/*"],
+      "@/store/*": ["store/*"],
       "@/utils/*": ["utils/*"],
       "@/types/*": ["types/*"],
-      "@/store/*": ["store/*"],
-      "@/services/*": ["services/*"],
-      "@/styles/*": ["styles/*"]
+      "@/constants/*": ["constants/*"]
     }
   },
   "include": [
     "src"
+  ],
+  "exclude": [
+    "node_modules"
   ]
 } 
